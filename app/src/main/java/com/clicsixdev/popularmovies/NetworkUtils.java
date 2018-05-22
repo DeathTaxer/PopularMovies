@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public final class NetworkUtils {
 
-    private static final String API_KEY = "";//Enter your api key here
+    private static final String API_KEY = "58d4d076b2f16506f8a0eef598dcbd12";//Enter your api key here
     private static final String POP_URL = "https://api.themoviedb.org/3/movie/popular";
     private static final String TOP_URL = "https://api.themoviedb.org/3/movie/top_rated";
     private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
