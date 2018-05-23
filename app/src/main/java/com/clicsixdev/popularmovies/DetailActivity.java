@@ -3,6 +3,7 @@ package com.clicsixdev.popularmovies;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView mDateDisplay;
     private TextView mDescDisplay;
     private ImageView mPosterDisplay;
+    private Button mFavButton;
     private Movie movie;
 
     @Override
@@ -27,6 +29,7 @@ public class DetailActivity extends AppCompatActivity {
         mRatingDisplay = (TextView) findViewById(R.id.rating_display);
         mDateDisplay = (TextView) findViewById(R.id.date_display);
         mDescDisplay = (TextView) findViewById(R.id.desc_display);
+        mFavButton = (Button) findViewById(R.id.fav_button);
 
         Intent intentThatStartedThisActivity = getIntent();
 

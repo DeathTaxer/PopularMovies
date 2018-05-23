@@ -72,8 +72,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         currentType = POP;
 
         Log.i("aravind","In onCreate");
+        getSupportLoaderManager().enableDebugLogging(true);
 
         getSupportLoaderManager().initLoader(MOVIE_SEARCH_LOADER,typeBundle,this);
+
 
 
     }
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 else {
                     forceLoad();
                 }
+
 
             }
 

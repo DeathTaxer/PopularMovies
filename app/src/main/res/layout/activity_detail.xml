@@ -58,11 +58,22 @@
         android:layout_toRightOf="@id/detail_poster"
         />
 
+    <Button
+        android:id="@+id/fav_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="@string/fav_movie"
+        android:layout_below="@id/date_display"
+        android:layout_toRightOf="@id/detail_poster"
+        android:padding="8dp"/>
+
+
+
     <TextView
         android:id="@+id/desc_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/detail_poster"
+        android:layout_below="@id/detail_poster"
         android:padding="8dp"
         android:textColor="#000000"
         android:textSize="18sp"
