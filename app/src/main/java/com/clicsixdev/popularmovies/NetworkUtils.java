@@ -70,7 +70,7 @@ public final class NetworkUtils {
     }
 
     public static List<Movie> getMoviesFromJson(Context context, String movieJsonStr) throws JSONException{
-        String title,posterUrl,description,userRating,releaseDate;
+        String id,title,posterUrl,description,userRating,releaseDate;
         List<Movie> movieList = new ArrayList<Movie>();
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
@@ -90,11 +90,13 @@ public final class NetworkUtils {
 
             userRating = movieDetail.getString("vote_average");
 
+            id = movieDetail.getString("id");
+
             releaseDate = movieDetail.getString("release_date");
 
             Log.i(title,releaseDate);
 
-            movieList.add(new Movie(title,posterUrl,description,userRating,releaseDate));
+            movieList.add(new Movie(id,title,posterUrl,description,userRating,releaseDate));
 
 
 

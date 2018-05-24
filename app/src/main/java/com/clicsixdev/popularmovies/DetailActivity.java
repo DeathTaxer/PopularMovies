@@ -3,6 +3,7 @@ package com.clicsixdev.popularmovies;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,5 +48,11 @@ public class DetailActivity extends AppCompatActivity {
         Picasso.with(this)
                 .load(movie.getPosterUrl())
                 .into(mPosterDisplay);
+        mFavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 }
