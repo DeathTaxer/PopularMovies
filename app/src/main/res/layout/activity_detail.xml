@@ -62,7 +62,7 @@
         android:id="@+id/fav_button"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="@string/fav_movie"
+        android:text="@string/action_fav"
         android:layout_below="@id/date_display"
         android:layout_toRightOf="@id/detail_poster"
         android:padding="8dp"/>
@@ -79,6 +79,64 @@
         android:textSize="18sp"
         tools:text = "This is the description for the movie"
     />
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/desc_display"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#dadada"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_below="@id/desc_display"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Trailers:"
+            android:textSize="24sp"
+            android:textColor="#000000"
+            android:id="@+id/trailer_title_view"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/trailers_group"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Reviews:"
+            android:textSize="24sp"
+            android:textColor="#000000"
+            android:id="@+id/review_title_view"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:id="@+id/review_display"
+            android:textColor="#000000"/>
+
+
+
+
+    </LinearLayout>
 
 
 

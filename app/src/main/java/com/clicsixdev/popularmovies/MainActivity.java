@@ -3,6 +3,7 @@ package com.clicsixdev.popularmovies;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -26,18 +27,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler,
-        LoaderManager.LoaderCallbacks<List<Movie>>{
+        LoaderManager.LoaderCallbacks<List<Movie>> {
 
     private static String TAG = MainActivity.class.getSimpleName();
     private static final String POP = "pop";
     private static final String TOP = "top";
+    private static final String FAV = "fav";
     private static String currentType;
 
-    private static final int MOVIE_SEARCH_LOADER = 11;
+    private static int x = 0;
 
+    private static final int MOVIE_SEARCH_LOADER = 11;
+    private static final int FAV_MOVIE_SEARCH_LOADER = 22;
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -55,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this,2);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
 
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -67,15 +72,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         Bundle typeBundle = new Bundle();
 
-        typeBundle.putString("type_extra" , POP);
+        typeBundle.putString("type_extra", POP);
 
         currentType = POP;
 
-        Log.i("aravind","In onCreate");
+        Log.i("aravind", "In onCreate");
         getSupportLoaderManager().enableDebugLogging(true);
 
-        getSupportLoaderManager().initLoader(MOVIE_SEARCH_LOADER,typeBundle,this);
-
+        getSupportLoaderManager().initLoader(MOVIE_SEARCH_LOADER, typeBundle, this);
 
 
     }
@@ -84,41 +88,50 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public void onClick(Movie clickedMovie) {
         Context context = this;
         Class destinationClass = DetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(this,destinationClass);
-        intentToStartDetailActivity.putExtra("Movie" , clickedMovie );
+        Intent intentToStartDetailActivity = new Intent(this, destinationClass);
+        intentToStartDetailActivity.putExtra("Movie", clickedMovie);
         startActivity(intentToStartDetailActivity);
     }
 
-    private void loadMovieData(String type){
-        if(isOnline() == true) {
+    private void loadMovieData(String type) {
+        if (isOnline() == true) {
             showMovieDataView();
+
+            LoaderManager loaderManager = getSupportLoaderManager();
+
 
             Bundle typeBundle = new Bundle();
 
-            typeBundle.putString("type_extra" , type);
+            typeBundle.putString("type_extra", type);
 
-            LoaderManager loaderManager = getSupportLoaderManager();
+
             Loader<List<Movie>> movieSearchLoader = loaderManager.getLoader(MOVIE_SEARCH_LOADER);
 
-            if (movieSearchLoader == null){
-            loaderManager.initLoader(MOVIE_SEARCH_LOADER,typeBundle,this);
-            }
-            else {
-                loaderManager.restartLoader(MOVIE_SEARCH_LOADER,typeBundle,this);
+            if (movieSearchLoader == null) {
+                loaderManager.initLoader(MOVIE_SEARCH_LOADER, typeBundle, this);
+            } else {
+                loaderManager.restartLoader(MOVIE_SEARCH_LOADER, typeBundle, this);
 
             }
-        }
-        else showErrorMsgView();
+        } else showErrorMsgView();
     }
 
-    private void showMovieDataView(){
+
+    private void showMovieDataView() {
         mErrorMsgDisplay.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
 
-    private void showErrorMsgView(){
+    private void showErrorMsgView() {
         mRecyclerView.setVisibility(View.INVISIBLE);
+        if (currentType.equals(FAV) && getContentResolver().query(MovieListContract.MovieListEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null).getCount() == 0)
+            mErrorMsgDisplay.setText("No Favourites added");
+        else mErrorMsgDisplay.setText(R.string.error_msg);
         mErrorMsgDisplay.setVisibility(View.VISIBLE);
     }
 
@@ -127,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @NonNull
     @Override
     public Loader<List<Movie>> onCreateLoader(int id, @Nullable final Bundle args) {
+
         return new AsyncTaskLoader<List<Movie>>(this) {
 
             List<Movie> mList;
@@ -134,17 +148,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             @Override
             protected void onStartLoading() {
 
-                Log.i("aravind","onStartLoading");
+                Log.i("aravind", "onStartLoading");
 
                 if (args == null) {
                     return;
                 }
                 mProgressBar.setVisibility(View.VISIBLE);
-                if (mList != null){
-                    Log.i("aravind","In Caching Area");
+                if (mList != null) {
+                    Log.i("aravind", "In Caching Area");
                     deliverResult(mList);
-                }
-                else {
+                } else {
                     forceLoad();
                 }
 
@@ -154,19 +167,66 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             @Nullable
             @Override
             public List<Movie> loadInBackground() {
-                Log.i("aravind","loadInBackground");
+                Log.i("aravind", "loadInBackground");
 
-                   String searchType = args.getString("type_extra");
+                String searchType = args.getString("type_extra");
 
-                    if (searchType == null || TextUtils.isEmpty(searchType)) {
-                        return null;
-                    }
+                if (searchType == null || TextUtils.isEmpty(searchType)) {
+                    return null;
+                }
+
+                if (searchType.equals(FAV)) {
+                    List<Movie> movieList = new ArrayList<Movie>();
+                    Cursor c = getContentResolver().query(MovieListContract.MovieListEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            null);
+
+
+
+                    int idIndex = c.getColumnIndex(MovieListContract.MovieListEntry.COLUMN_MOVIE_ID);
+
+                    c.moveToFirst();
+
+                    Log.d("Cursor count", c.getCount() + "");
+                    try {
+                    do {
+
+                        int id = c.getInt(idIndex);
+                        Log.d("MovieId", id + "");
+                        URL movieRequestUrl = NetworkUtils.buildMovieUrl(Integer.toString(id));
+                        Log.d("aravind", movieRequestUrl.toString());
+
+                        String movieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
+
+                        Movie m = NetworkUtils.getMovieFromJson(MainActivity.this, movieResponse);
+
+                        Log.d("Movie Details", m.getId() + "\n"
+                                + m.getTitle() + "\n"
+                                + m.getPosterUrl());
+
+                        movieList.add(m);
+
+
+                    } while (c.moveToNext());
+
+                } catch(Exception e){
+                    e.printStackTrace();
+                    Log.d("aravind", "in the exception area");
+                    return null;
+                }
+
+                return movieList;
+
+
+                } else {
 
                     URL movieRequestUrl = NetworkUtils.buildUrl(searchType);
                     try {
                         String movieResponse = NetworkUtils.getResponseFromHttpUrl(movieRequestUrl);
 
-                       List<Movie>  movieList = NetworkUtils.getMoviesFromJson(MainActivity.this, movieResponse);
+                        List<Movie> movieList = NetworkUtils.getMoviesFromJson(MainActivity.this, movieResponse);
 
                         return movieList;
                     } catch (Exception e) {
@@ -175,12 +235,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     }
 
 
+                }
+
+
             }
 
             @Override
             public void deliverResult(@Nullable List<Movie> data) {
 
-                Log.i("aravind","in Deliver Result");
+
 
                 mList = data;
                 super.deliverResult(data);
@@ -192,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @Override
     public void onLoadFinished(@NonNull Loader<List<Movie>> loader, List<Movie> data) {
 
-        Log.i("aravind","onLoadFinished");
+        Log.i("aravind", "onLoadFinished");
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
@@ -201,11 +264,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (data != null) {
             showMovieDataView();
             mMovieAdapter.setMovieData(data);
+        } else {
+            showErrorMsgView();
         }
-        else
-        {showErrorMsgView();}
     }
-
 
 
     @Override
@@ -227,25 +289,34 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         int id = item.getItemId();
 
-        if (id == R.id.action_popular)
-        {
+        if (id == R.id.action_popular) {
             mMovieAdapter.setMovieData(null);
-            loadMovieData(POP);
             currentType = POP;
+            loadMovieData(POP);
+
             return true;
 
         }
 
-        if (id == R.id.action_top){
+        if (id == R.id.action_top) {
             mMovieAdapter.setMovieData(null);
-            loadMovieData(TOP);
             currentType = TOP;
+            loadMovieData(TOP);
+            ;
             return true;
         }
 
-        if (id == R.id.action_refresh){
+        if (id == R.id.action_refresh) {
             mMovieAdapter.setMovieData(null);
             loadMovieData(currentType);
+            return true;
+        }
+
+        if (id == R.id.action_fav) {
+            mMovieAdapter.setMovieData(null);
+            currentType = FAV;
+            loadMovieData(FAV);
+
             return true;
         }
 
