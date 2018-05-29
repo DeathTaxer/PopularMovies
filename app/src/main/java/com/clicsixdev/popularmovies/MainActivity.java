@@ -85,6 +85,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        Bundle typeBundle = new Bundle();
+
+        typeBundle.putString("type_extra", currentType);
+
+        getSupportLoaderManager().restartLoader(MOVIE_SEARCH_LOADER,typeBundle,this);
+    }
+
+    @Override
     public void onClick(Movie clickedMovie) {
         Context context = this;
         Class destinationClass = DetailActivity.class;

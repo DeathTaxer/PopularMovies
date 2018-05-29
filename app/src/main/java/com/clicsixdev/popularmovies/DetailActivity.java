@@ -41,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
     private LinearLayout trailerLayout;
     private TextView reviewDisplay;
     private TextView reviewTitle;
+    private int fav = 0;
 
     @SuppressLint("StaticFieldLeak")
     @Override
@@ -67,6 +68,18 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
+
+        Uri uri = MovieListContract.MovieListEntry.CONTENT_URI;
+        uri = uri.buildUpon().appendPath(movie.getId()).build();
+
+        Cursor cursor = getContentResolver().query(uri,
+                null,null,null,null);
+
+        if (cursor.getCount() == 1) {
+            mFavButton.setText("Remove as Favourite");
+            fav = 1;
+        }
+
         mTitleDisplay.setText(movie.getTitle());
         mRatingDisplay.setText(movie.getUserRating() + "/10");
         mDateDisplay.setText(movie.getReleaseDate());
@@ -80,16 +93,23 @@ public class DetailActivity extends AppCompatActivity {
 
                 ContentValues values = new ContentValues();
                 values.put(MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,movie.getId());
+                values.put(MovieListContract.MovieListEntry.COLUMN_MOVIE_TITLE,movie.getTitle());
 
-                Uri uri = MovieListContract.MovieListEntry.CONTENT_URI;
-                uri = uri.buildUpon().appendPath(movie.getId()).build();
 
-               Cursor cursor = getContentResolver().query(uri,
-                        null,null,null,null);
+               if (fav == 1 ){
 
-               if (cursor.getCount() == 1 ){
+                   Uri uri = MovieListContract.MovieListEntry.CONTENT_URI;
+                   uri = uri.buildUpon().appendPath(movie.getId()).build();
 
-                   Toast.makeText(getBaseContext(),"Already added to the favourites",Toast.LENGTH_SHORT).show();
+                   int moviesDeleted = getContentResolver().delete(uri,null,null);
+
+                   if (moviesDeleted != 0 ) {
+
+                       fav = 0;
+                       Toast.makeText(getBaseContext(), "Removed from the favourites", Toast.LENGTH_SHORT).show();
+                       mFavButton.setText(R.string.action_fav);
+                   }
+
 
                }
 
@@ -98,6 +118,8 @@ public class DetailActivity extends AppCompatActivity {
 
                    if (retUri != null)
                        Toast.makeText(getBaseContext(),"Added to the favourites",Toast.LENGTH_SHORT).show();
+                   mFavButton.setText("Remove as Favourite");
+                   fav = 1;
 
 
 
@@ -140,14 +162,24 @@ public class DetailActivity extends AppCompatActivity {
                                 LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                                TextView tv = new TextView(DetailActivity.this);
+                                Button tv = new Button(DetailActivity.this);
 
                                 final Uri uri = Uri.parse(NetworkUtils.YT_URL+"/"+ trailers.get(i));
 
                                 tv.setText("Trailer "+ (i+1));
+                                float scale = getResources().getDisplayMetrics().density;
+                                int dpAsPixels = (int) (8*scale + 0.5f);
+                                tv.setPadding(dpAsPixels,dpAsPixels,dpAsPixels,dpAsPixels);
+
+                                lparams.setMargins(0,dpAsPixels,0,0);
+                                tv.setBackgroundColor(Color.parseColor("#229954"));
+
+                                tv.setClickable(true);
+
+                                tv.setFocusable(true);
                                 tv.setLayoutParams(lparams);
                                 tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                                tv.setTextColor(Color.parseColor("#000000"));
+
                                 tv.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {

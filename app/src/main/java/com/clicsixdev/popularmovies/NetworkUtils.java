@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -217,9 +218,9 @@ public final class NetworkUtils {
 
         for (int i = 0; i < resultsArray.length(); i++) {
 
-            JSONObject review  = resultsArray.getJSONObject(i);
+            JSONObject review = resultsArray.getJSONObject(i);
 
-            reviewList.add(review.getString("author") +"\n\n" + review.getString("content"));
+            reviewList.add(review.getString("author") + ":\n\n" + review.getString("content"));
 
 
         }

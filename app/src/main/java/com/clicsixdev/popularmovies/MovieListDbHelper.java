@@ -21,7 +21,8 @@ public class MovieListDbHelper extends SQLiteOpenHelper{
 
         final String CREATE_TABLE = "CREATE TABLE " + MovieListContract.MovieListEntry.TABLE_NAME + " (" +
                 MovieListContract.MovieListEntry._ID + " INTERGER PRIMARY KEY, " +
-                MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL);";
+                MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieListContract.MovieListEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL);";
 
             sqLiteDatabase.execSQL(CREATE_TABLE);
 

@@ -18,5 +18,6 @@ public class MovieListContract {
 
         public static final String TABLE_NAME = "movielist";
         public static final String COLUMN_MOVIE_ID = "movieId";
+        public static final String COLUMN_MOVIE_TITLE = "movieTitle";
         }
 }
